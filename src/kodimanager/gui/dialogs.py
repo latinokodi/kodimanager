@@ -2,7 +2,8 @@ import os
 import threading
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
                             QLineEdit, QPushButton, QComboBox, QProgressBar, 
-                            QFileDialog, QMessageBox, QRadioButton, QButtonGroup, QWidget)
+                            QFileDialog, QMessageBox, QRadioButton, QButtonGroup, 
+                            QWidget, QFrame)
 from PyQt6.QtCore import pyqtSignal, Qt, QThread
 from PyQt6.QtGui import QPixmap
 import webbrowser
@@ -64,48 +65,189 @@ class InstallDialog(QDialog):
         self.load_versions()
         
     def setup_ui(self):
+        self.setStyleSheet("background-color: #111827; color: white;")
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Main Card Frame
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background-color: #1f2937;
+                border-radius: 12px;
+                border: 1px solid #374151;
+            }
+            QLabel {
+                border: none;
+                background-color: transparent;
+            }
+        """)
+        card_layout = QVBoxLayout(card)
+        card_layout.setContentsMargins(20, 20, 20, 20)
+        card_layout.setSpacing(15)
+        
+        # Header
+        header = QLabel("Nueva Instalación")
+        header.setStyleSheet("font-size: 20px; font-weight: bold; color: #60a5fa;")
+        card_layout.addWidget(header)
+        
+        # Separator
+        sep1 = QFrame()
+        sep1.setFrameShape(QFrame.Shape.HLine)
+        sep1.setFrameShadow(QFrame.Shadow.Sunken)
+        sep1.setStyleSheet("background-color: #4b5563; max-height: 1px;")
+        card_layout.addWidget(sep1)
         
         # Version Selection
-        layout.addWidget(QLabel("Versión de Kodi:"))
+        lbl_ver = QLabel("Versión de Kodi:")
+        lbl_ver.setStyleSheet("color: #9ca3af; font-size: 14px;")
+        card_layout.addWidget(lbl_ver)
+        
         self.lbl_version_display = QLabel("Cargando...")
-        self.lbl_version_display.setStyleSheet("font-weight: bold; font-size: 14px;")
-        layout.addWidget(self.lbl_version_display)
+        self.lbl_version_display.setStyleSheet("font-weight: bold; font-size: 16px; color: white;")
+        card_layout.addWidget(self.lbl_version_display)
         
-        # Name
-        layout.addWidget(QLabel("Nombre de la Instancia:"))
+        # Name input
+        lbl_name = QLabel("Nombre de la Instancia:")
+        lbl_name.setStyleSheet("color: #9ca3af; font-size: 14px;")
+        card_layout.addWidget(lbl_name)
+        
         self.le_name = QLineEdit("Kodi Portable")
-        layout.addWidget(self.le_name)
+        self.le_name.setStyleSheet("""
+            QLineEdit {
+                background-color: #374151;
+                border: 1px solid #4b5563;
+                border-radius: 6px;
+                padding: 8px;
+                color: white;
+                font-size: 14px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #60a5fa;
+            }
+        """)
+        card_layout.addWidget(self.le_name)
         
-        # Path
-        layout.addWidget(QLabel("Ruta de Instalación:"))
+        # Path input
+        lbl_path = QLabel("Ruta de Instalación:")
+        lbl_path.setStyleSheet("color: #9ca3af; font-size: 14px;")
+        card_layout.addWidget(lbl_path)
+        
         path_layout = QHBoxLayout()
         self.le_path = QLineEdit(os.path.join(os.getcwd(), "Instances"))
+        self.le_path.setStyleSheet("""
+            QLineEdit {
+                background-color: #374151;
+                border: 1px solid #4b5563;
+                border-radius: 6px;
+                padding: 8px;
+                color: white;
+                font-size: 14px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #60a5fa;
+            }
+        """)
+        
         self.btn_browse = QPushButton("Explorar...")
+        self.btn_browse.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_browse.setStyleSheet("""
+            QPushButton {
+                background-color: #4b5563;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #6b7280;
+            }
+        """)
         self.btn_browse.clicked.connect(self.browse_path)
+        
         path_layout.addWidget(self.le_path)
         path_layout.addWidget(self.btn_browse)
-        layout.addLayout(path_layout)
+        card_layout.addLayout(path_layout)
+        
+        # Separator 2
+        sep2 = QFrame()
+        sep2.setFrameShape(QFrame.Shape.HLine)
+        sep2.setFrameShadow(QFrame.Shadow.Sunken)
+        sep2.setStyleSheet("background-color: #4b5563; max-height: 1px;")
+        card_layout.addWidget(sep2)
         
         # Progress
         self.lbl_status = QLabel("")
-        layout.addWidget(self.lbl_status)
+        self.lbl_status.setStyleSheet("color: #f59e0b;") # Orange for status
+        card_layout.addWidget(self.lbl_status)
         self.progress = QProgressBar()
+        self.progress.setStyleSheet("""
+            QProgressBar {
+                border: none;
+                background-color: #374151;
+                border-radius: 4px;
+                height: 8px;
+                text-align: center;
+            }
+            QProgressBar::chunk {
+                background-color: #10b981;
+                border-radius: 4px;
+            }
+        """)
         self.progress.setVisible(False)
-        layout.addWidget(self.progress)
+        card_layout.addWidget(self.progress)
         
-        # Buttons
+        layout.addWidget(card)
+        
+        # Buttons Setup outside/bottom
         btn_layout = QHBoxLayout()
+        btn_layout.setContentsMargins(0, 10, 0, 0)
+        
+        self.btn_cancel = QPushButton("Cancelar")
+        self.btn_cancel.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_cancel.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #9ca3af;
+                font-weight: bold;
+                border: 1px solid #4b5563;
+                border-radius: 6px;
+                padding: 10px 20px;
+            }
+            QPushButton:hover {
+                background-color: #1f2937;
+                color: white;
+            }
+        """)
+        self.btn_cancel.clicked.connect(self.reject)
+        
         self.btn_install = QPushButton("Instalar")
+        self.btn_install.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_install.setStyleSheet("""
+            QPushButton {
+                background-color: #2563eb;
+                color: white;
+                font-weight: bold;
+                border-radius: 6px;
+                padding: 10px 30px;
+            }
+            QPushButton:hover {
+                background-color: #3b82f6;
+            }
+            QPushButton:disabled {
+                background-color: #4b5563;
+                color: #9ca3af;
+            }
+        """)
         self.btn_install.clicked.connect(self.start_install)
         # Disable install until version is loaded
         self.btn_install.setEnabled(False) 
         
-        self.btn_cancel = QPushButton("Cancelar")
-        self.btn_cancel.clicked.connect(self.reject)
         btn_layout.addStretch()
-        btn_layout.addWidget(self.btn_install)
         btn_layout.addWidget(self.btn_cancel)
+        btn_layout.addWidget(self.btn_install)
+        
         layout.addLayout(btn_layout)
         
     def load_versions(self):
@@ -298,6 +440,16 @@ class AboutDialog(QDialog):
         btn_twitch.clicked.connect(lambda: webbrowser.open("https://www.twitch.tv/Latinokodi"))
         
         layout.addWidget(btn_twitch, alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        layout.addSpacing(15)
+        
+        btn_enter = QPushButton("Entrar en la app")
+        btn_enter.setFixedWidth(200)
+        btn_enter.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_enter.setStyleSheet("background-color: #10b981; color: white; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 14px;")
+        btn_enter.clicked.connect(self.accept)
+        
+        layout.addWidget(btn_enter, alignment=Qt.AlignmentFlag.AlignCenter)
         
         layout.addStretch()
 
