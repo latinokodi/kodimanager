@@ -1,59 +1,59 @@
 # Kodi Manager
 
-A Windows desktop application to manage multiple portable instances of Kodi 64-bit.
+Una aplicación de escritorio para Windows para gestionar múltiples instancias portables de Kodi 64-bit.
 
-## Overview
-Kodi Manager allows users to:
-- Download Kodi from official sources (or mirrors).
-- Install Kodi in "portable mode" to separate folders.
-- Maintain multiple independent installations side-by-side.
-- Launch instances with the correct `-p` flag.
-- "Clean Sweep" instances (reset user data) individually.
+## Resumen
+Kodi Manager permite a los usuarios:
+- Descargar Kodi desde fuentes oficiales (o espejos/mirrors).
+- Instalar Kodi en "modo portable" en carpetas separadas.
+- Mantener múltiples instalaciones independientes una al lado de la otra.
+- Iniciar instancias con la bandera correcta `-p`.
+- Realizar "Limpieza Total" de instancias (resetear datos de usuario) individualmente.
 
-## Architecture
-The application is built with a clear separation of concerns:
-- **Core Logic (`src/kodimanager/core`)**: Handles downloading, extracting, and instance registry management. Independent of the GUI.
-- **GUI (`src/kodimanager/gui`)**: A responsive interface built with PyQt6.
-- **Data**: Uses a simple JSON `instances.json` to track installed versions and paths.
+## Arquitectura
+La aplicación está construida con una clara separación de responsabilidades:
+- **Lógica Central (`src/kodimanager/core`)**: Maneja la descarga, extracción y gestión del registro de instancias. Independiente de la GUI.
+- **GUI (`src/kodimanager/gui`)**: Una interfaz responsiva construida con PyQt6.
+- **Datos**: Utiliza un simple JSON `instances.json` para rastrear las versiones y rutas instaladas.
 
-### Tech Stack
-- **Language**: Python 3.10+ (Selected for robust file handling, excellent standard library, and cross-platform support).
-- **GUI Framework**: `PyQt6` (Professional, native look and feel, robust event loop).
-- **Network**: `requests` + `beautifulsoup4` (Reliable header handling and parsing for download pages).
-- **Environment**: Virtual Environment (`venv`) based (Strategy B).
+### Stack Tecnológico
+- **Lenguaje**: Python 3.10+ (Seleccionado por su robusto manejo de archivos, excelente librería estándar y soporte multiplataforma).
+- **Framework GUI**: `PyQt6` (Aspecto y sensación profesional y nativa, bucle de eventos robusto).
+- **Red**: `requests` + `beautifulsoup4` (Manejo confiable de encabezados y análisis para páginas de descarga).
+- **Entorno**: Basado en Entorno Virtual (`venv`) (Estrategia B).
 
-## Use of Filesystem
-- **Project Root**: Contains source code and launchers.
-- **Runtime Data**: 
-    - Configuration and Instance Registry are stored in `%APPDATA%\KodiManager` (Windows) or `~/.config/kodimanager` (Linux) to avoid polluting the workspace, though portable instances can be installed anywhere the user chooses (defaulting to a `KodiInstances` folder).
-    - **Note**: The application respects the "External Files" rule by default but allows user overrides.
+## Uso del Sistema de Archivos
+- **Raíz del Proyecto**: Contiene el código fuente y los lanzadores.
+- **Datos de Ejecución**: 
+    - La configuración y el Registro de Instancias se almacenan en `%APPDATA%\KodiManager` (Windows) o `~/.config/kodimanager` (Linux) para evitar contaminar el espacio de trabajo, aunque las instancias portables se pueden instalar donde el usuario elija (por defecto en una carpeta `KodiInstances`).
+    - **Nota**: La aplicación respeta la regla de "Archivos Externos" por defecto pero permite anulaciones del usuario.
 
-## Installation & Running
+## Instalación y Ejecución
 
-### Prerequisites
-- Windows 10/11 (Primary target) or Linux.
-- Python 3.10 or higher installed.
+### Prerrequisitos
+- Windows 10/11 (Objetivo principal) o Linux.
+- Python 3.10 o superior instalado.
 
-### Running
-We use **Strategy B: Project-local environment**.
+### Ejecución
+Usamos la **Estrategia B: Entorno local del proyecto**.
 
 **Windows:**
-Double-click `run_app.bat`. This will:
-1. Create a Python virtual environment (`venv`) if missing.
-2. Install dependencies.
-3. Launch the application.
+Haga doble clic en `run_app.bat`. Esto:
+1. Creará un entorno virtual de Python (`venv`) si falta.
+2. Instalará las dependencias.
+3. Iniciará la aplicación.
 
 **Linux/macOS:**
-Run `./run_app.sh`.
+Ejecute `./run_app.sh`.
 
-## Testing
-Run tests with:
+## Pruebas
+Ejecute las pruebas con:
 ```bash
-# Activate venv first
+# Active venv primero
 python -m pytest tests
 ```
 
-## Security & Performance
-- Downloads are verified if hashes are available (future improvement).
-- No admin privileges required for standard operation (unless installing to protected folders, which is discouraged).
-- "Clean Sweep" is a destructive operation; the UI includes confirmation dialogs.
+## Seguridad y Rendimiento
+- Las descargas se verifican si los hashes están disponibles (mejora futura).
+- No se requieren privilegios de administrador para la operación estándar (a menos que se instale en carpetas protegidas, lo cual se desaconseja).
+- "Limpieza Total" es una operación destructiva; la interfaz incluye diálogos de confirmación.
