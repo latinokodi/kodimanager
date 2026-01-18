@@ -115,6 +115,10 @@ class MainWindow(QMainWindow):
         self.btn_add = QPushButton("Nueva Instalación")
         self.btn_add.clicked.connect(self.show_install_dialog)
         
+        self.btn_refresh = QPushButton("Refrescar")
+        self.btn_refresh.setObjectName("ActionBtn")
+        self.btn_refresh.clicked.connect(self.refresh_list)
+        
         # Admin Restart Button
         self.btn_admin = QPushButton("Reiniciar (Admin)")
         self.btn_admin.setObjectName("ActionBtn")

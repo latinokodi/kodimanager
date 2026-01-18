@@ -227,7 +227,8 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Acerca de Kodi Manager")
-        self.setFixedSize(500, 450)
+        self.setMinimumWidth(500) # changed from FixedSize to prevent cropping
+        # Allow height to grow as needed
         self.setStyleSheet("background-color: #111827; color: white;")
         self.setup_ui()
 
@@ -278,8 +279,8 @@ class AboutDialog(QDialog):
             "<span style='font-size:14px; font-weight:600; color:#60a5fa;'>📅 Horario de Directos</span><br/>"
             "<span style='font-size:12px; color:#e5e7eb;'>Lunes, Miércoles, Viernes y Domingos</span></p>"
             "<p align='center' style='font-size:12px; color:#9ca3af;'>"
-            "🇲🇽 19:00 | 🇨🇴 🇵🇪 20:00 | 🇻🇪 21:00<br/>"
-            "🇦🇷 🇨🇱 22:00 | 🇪🇸 02:00"
+            "🇲🇽 7:00 PM | 🇨🇴 🇵🇪 8:00 PM | 🇻🇪 9:00 PM<br/>"
+            "🇦🇷 🇨🇱 10:00 PM | 🇪🇸 2:00 AM"
             "</p></body></html>"
         )
         self.lbl_schedule = QLabel(schedule_text)
