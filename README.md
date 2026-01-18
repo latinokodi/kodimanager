@@ -59,9 +59,17 @@ python -m pytest tests
 - "Limpieza Total" es una operación destructiva; la interfaz incluye diálogos de confirmación.
 
 ## Horario de Transmisiones (Twitch)
-- **Lunes a Viernes**: 9:00 PM (Hora Colombia)
-- **Fines de Semana**: Anunciado en Discord
-- [Visita el canal aquí](https://www.twitch.tv/Latinokodi)
+🔴 **En Vivo**: Lunes, Miércoles, Viernes y Domingos
+
+| Zona | Hora |
+| :--- | :--- |
+| 🇲🇽 México (CDMX) | 7:00 PM |
+| 🇨🇴 Colombia / 🇵🇪 Perú | 8:00 PM |
+| 🇻🇪 Venezuela | 9:00 PM |
+| 🇦🇷 Argentina / 🇨🇱 Chile | 10:00 PM |
+| 🇪🇸 España | 2:00 AM (Día sgte) |
+
+[Visita el canal aquí](https://www.twitch.tv/Latinokodi)
 
 ## Autor
 **Latinokodi 2026**

@@ -11,7 +11,7 @@ from PyQt6.QtGui import QIcon, QAction, QPixmap
 from ..core.manager import InstanceManager
 from ..core.models import KodiInstance
 from ..utils import admin
-from .dialogs import InstallDialog, ShortcutDialog
+from .dialogs import InstallDialog, ShortcutDialog, AboutDialog
 from .styles import DARK_THEME
 
 class InstanceCard(QFrame):
@@ -89,29 +89,16 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout = QVBoxLayout(central_widget)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout.setSpacing(20)
         
-        # Tabs
-        self.tabs = QTabWidget()
-        main_layout.addWidget(self.tabs)
+        self.setup_manager_view()
         
-        # Tab 1: Manager
-        self.tab_manager = QWidget()
-        self.setup_manager_tab()
-        self.tabs.addTab(self.tab_manager, "Mis Instalaciones")
-        
-        # Tab 2: About
-        self.tab_about = QWidget()
-        self.setup_about_tab()
-        self.tabs.addTab(self.tab_about, "Acerca de")
+        # Show About Dialog on startup
+        self.show_about_dialog()
 
-    def setup_manager_tab(self):
-        layout = QVBoxLayout(self.tab_manager)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(20)
-        
-        # Header / Toolbar
+    def setup_manager_view(self):
         toolbar = QHBoxLayout()
         
         title = QLabel("Dashboard")
@@ -128,15 +115,16 @@ class MainWindow(QMainWindow):
         self.btn_add = QPushButton("Nueva Instalación")
         self.btn_add.clicked.connect(self.show_install_dialog)
         
-        self.btn_refresh = QPushButton("Refrescar")
-        self.btn_refresh.setObjectName("ActionBtn")
-        self.btn_refresh.clicked.connect(self.refresh_list)
-        
         # Admin Restart Button
         self.btn_admin = QPushButton("Reiniciar (Admin)")
         self.btn_admin.setObjectName("ActionBtn")
         self.btn_admin.setStyleSheet("background-color: #f59e0b; color: white;") # Orange for attention
         self.btn_admin.clicked.connect(lambda: admin.restart_as_admin())
+        
+        # About Button
+        self.btn_about = QPushButton("Acerca de")
+        self.btn_about.setObjectName("ActionBtn")
+        self.btn_about.clicked.connect(self.show_about_dialog)
         
         toolbar.addWidget(self.btn_detect)
         toolbar.addWidget(self.btn_refresh)
@@ -150,7 +138,9 @@ class MainWindow(QMainWindow):
             lbl_admin.setStyleSheet("color: #10b981; font-weight: bold; border: 1px solid #10b981; padding: 4px; border-radius: 4px;")
             toolbar.addWidget(lbl_admin)
             
-        layout.addLayout(toolbar)
+        toolbar.addWidget(self.btn_about)
+            
+        self.main_layout.addLayout(toolbar)
         
         # Scroll Area for Grid
         self.scroll_area = QScrollArea()
@@ -161,64 +151,11 @@ class MainWindow(QMainWindow):
         self.grid_layout.setSpacing(20)
         
         self.scroll_area.setWidget(self.scroll_widget)
-        layout.addWidget(self.scroll_area)
+        self.main_layout.addWidget(self.scroll_area)
 
-    def setup_about_tab(self):
-        layout = QVBoxLayout(self.tab_about)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        title = QLabel("KODI Manager")
-        title.setStyleSheet("font-size: 26px; font-weight: bold;")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        subtitle = QLabel("Versión 2.0 (PyQt6 Edition)")
-        subtitle.setStyleSheet("color: gray;")
-        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        author = QLabel("Latinokodi 2026")
-        author.setStyleSheet("color: #60a5fa; font-weight: bold;")
-        author.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        logo_path = os.path.join(os.path.dirname(__file__), "LKU-LOGO-Small.png")
-        if os.path.exists(logo_path):
-            logo_lbl = QLabel()
-            pixmap = QPixmap(logo_path)
-            # Scale if too big (e.g. max 300 width)
-            pixmap = pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
-            logo_lbl.setPixmap(pixmap)
-            logo_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            layout.addWidget(logo_lbl)
-        
-        layout.addSpacing(20)
-        
-        layout.addWidget(title)
-        layout.addWidget(subtitle)
-        layout.addWidget(author)
-        
-        layout.addSpacing(20)
-        
-        invite_msg = QLabel("Únete a nuestro canal de Twitch para obtener soporte y tutoriales en vivo.")
-        invite_msg.setStyleSheet("color: #60a5fa; font-size: 16px;")
-        invite_msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        invite_msg.setWordWrap(True)
-        layout.addWidget(invite_msg)
-
-        layout.addSpacing(10)
-        
-        # Schedule
-        self.lbl_schedule = QLabel("📅 Horario de Directos:\nLunes a Viernes: 9:00 PM (Hora Colombia)\nFines de Semana: Anunciado en Discord")
-        self.lbl_schedule.setStyleSheet("color: #d1d5db; font-size: 14px; background-color: #1f2937; padding: 10px; border-radius: 6px;")
-        self.lbl_schedule.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.lbl_schedule)
-        
-        layout.addSpacing(10)
-        
-        btn_twitch = QPushButton("Visitar Twitch")
-        btn_twitch.setFixedWidth(200)
-        btn_twitch.clicked.connect(lambda: webbrowser.open("https://www.twitch.tv/Latinokodi"))
-        layout.addWidget(btn_twitch, alignment=Qt.AlignmentFlag.AlignCenter)
-        
-        layout.addStretch()
+    def show_about_dialog(self):
+        dlg = AboutDialog(self)
+        dlg.exec()
 
     def refresh_list(self):
         # Clear grid

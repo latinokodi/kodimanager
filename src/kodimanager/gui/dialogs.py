@@ -4,6 +4,8 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
                             QLineEdit, QPushButton, QComboBox, QProgressBar, 
                             QFileDialog, QMessageBox, QRadioButton, QButtonGroup, QWidget)
 from PyQt6.QtCore import pyqtSignal, Qt, QThread
+from PyQt6.QtGui import QPixmap
+import webbrowser
 
 from ..core.downloader import KodiDownloader
 from ..core.installer import KodiInstaller
@@ -220,3 +222,81 @@ class ShortcutDialog(QDialog):
             self.accept()
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
+
+class AboutDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Acerca de Kodi Manager")
+        self.setFixedSize(500, 450)
+        self.setStyleSheet("background-color: #111827; color: white;")
+        self.setup_ui()
+
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        title = QLabel("KODI Manager")
+        title.setStyleSheet("font-size: 26px; font-weight: bold; color: white;")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        subtitle = QLabel("Versión 2.0 (PyQt6 Edition)")
+        subtitle.setStyleSheet("color: gray;")
+        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        author = QLabel("Latinokodi 2026")
+        author.setStyleSheet("color: #60a5fa; font-weight: bold;")
+        author.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        logo_path = os.path.join(os.path.dirname(__file__), "LKU-LOGO-Small.png")
+        if os.path.exists(logo_path):
+            logo_lbl = QLabel()
+            pixmap = QPixmap(logo_path)
+            pixmap = pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
+            logo_lbl.setPixmap(pixmap)
+            logo_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(logo_lbl)
+        
+        layout.addSpacing(20)
+        
+        layout.addWidget(title)
+        layout.addWidget(subtitle)
+        layout.addWidget(author)
+        
+        layout.addSpacing(20)
+        
+        invite_msg = QLabel("Únete a nuestro canal de Twitch para obtener soporte y tutoriales en vivo.")
+        invite_msg.setStyleSheet("color: #60a5fa; font-size: 16px;")
+        invite_msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        invite_msg.setWordWrap(True)
+        layout.addWidget(invite_msg)
+
+        layout.addSpacing(10)
+        
+        # Schedule
+        schedule_text = (
+            "<html><head/><body><p align='center'>"
+            "<span style='font-size:14px; font-weight:600; color:#60a5fa;'>📅 Horario de Directos</span><br/>"
+            "<span style='font-size:12px; color:#e5e7eb;'>Lunes, Miércoles, Viernes y Domingos</span></p>"
+            "<p align='center' style='font-size:12px; color:#9ca3af;'>"
+            "🇲🇽 19:00 | 🇨🇴 🇵🇪 20:00 | 🇻🇪 21:00<br/>"
+            "🇦🇷 🇨🇱 22:00 | 🇪🇸 02:00"
+            "</p></body></html>"
+        )
+        self.lbl_schedule = QLabel(schedule_text)
+        self.lbl_schedule.setStyleSheet("background-color: #1f2937; padding: 10px; border-radius: 6px;")
+        self.lbl_schedule.setTextFormat(Qt.TextFormat.RichText)
+        self.lbl_schedule.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.lbl_schedule)
+        
+        layout.addSpacing(20)
+        
+        btn_twitch = QPushButton("Visitar Twitch")
+        btn_twitch.setFixedWidth(200)
+        btn_twitch.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_twitch.setStyleSheet("background-color: #9146ff; color: white; padding: 8px; border-radius: 6px; font-weight: bold;")
+        btn_twitch.clicked.connect(lambda: webbrowser.open("https://www.twitch.tv/Latinokodi"))
+        
+        layout.addWidget(btn_twitch, alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        layout.addStretch()
+
