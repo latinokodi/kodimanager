@@ -174,6 +174,10 @@ class MainWindow(QMainWindow):
         subtitle = QLabel("Versión 2.0 (PyQt6 Edition)")
         subtitle.setStyleSheet("color: gray;")
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        author = QLabel("Latinokodi 2026")
+        author.setStyleSheet("color: #60a5fa; font-weight: bold;")
+        author.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         logo_path = os.path.join(os.path.dirname(__file__), "LKU-LOGO-Small.png")
         if os.path.exists(logo_path):
@@ -189,6 +193,7 @@ class MainWindow(QMainWindow):
         
         layout.addWidget(title)
         layout.addWidget(subtitle)
+        layout.addWidget(author)
         
         layout.addSpacing(20)
         
@@ -197,6 +202,14 @@ class MainWindow(QMainWindow):
         invite_msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
         invite_msg.setWordWrap(True)
         layout.addWidget(invite_msg)
+
+        layout.addSpacing(10)
+        
+        # Schedule
+        self.lbl_schedule = QLabel("📅 Horario de Directos:\nLunes a Viernes: 9:00 PM (Hora Colombia)\nFines de Semana: Anunciado en Discord")
+        self.lbl_schedule.setStyleSheet("color: #d1d5db; font-size: 14px; background-color: #1f2937; padding: 10px; border-radius: 6px;")
+        self.lbl_schedule.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.lbl_schedule)
         
         layout.addSpacing(10)
         

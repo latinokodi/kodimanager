@@ -57,3 +57,12 @@ python -m pytest tests
 - Las descargas se verifican si los hashes están disponibles (mejora futura).
 - No se requieren privilegios de administrador para la operación estándar (a menos que se instale en carpetas protegidas, lo cual se desaconseja).
 - "Limpieza Total" es una operación destructiva; la interfaz incluye diálogos de confirmación.
+
+## Horario de Transmisiones (Twitch)
+- **Lunes a Viernes**: 9:00 PM (Hora Colombia)
+- **Fines de Semana**: Anunciado en Discord
+- [Visita el canal aquí](https://www.twitch.tv/Latinokodi)
+
+## Autor
+**Latinokodi 2026**
+
