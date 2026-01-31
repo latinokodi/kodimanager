@@ -1,62 +1,46 @@
-# Kodi Manager
+# Kodi Manager v3.0
 
-Una aplicación de escritorio para Windows para gestionar múltiples instancias portables de Kodi 64-bit.
+Una aplicación de escritorio profesional para gestionar múltiples instancias portables de Kodi en Windows.
+
+## 🚀 Novedades (v3.0)
+- **UI Premium "Glassmorphism"**: Interfaz rediseñada con tema oscuro, efectos de transparencia y tarjetas modernas.
+- **Rendimiento Mejorado**: Detección de instancias 100% asíncrona (no congela la interfaz) y tiempo de inicio instantáneo.
+- **Seguridad**: Sistema de eliminación de instancias robusto que previene errores y riesgos de seguridad.
+- **Soporte Ko-fi**: Botón integrado para apoyar el desarrollo.
 
 ## Resumen
 Kodi Manager permite a los usuarios:
-- Descargar Kodi desde fuentes oficiales (o espejos/mirrors).
-- Instalar Kodi en "modo portable" en carpetas separadas.
-- Mantener múltiples instalaciones independientes una al lado de la otra.
-- Iniciar instancias con la bandera correcta `-p`.
-- Realizar "Limpieza Total" de instancias (resetear datos de usuario) individualmente.
+- Descargar Kodi desde fuentes oficiales.
+- Instalar Kodi en "modo portable" con un solo clic.
+- Gestionar múltiples instalaciones independientes.
+- Detectar instalaciones existentes automáticamente.
+- Crear accesos directos personalizados en el escritorio.
 
-## Arquitectura
-La aplicación está construida con una clara separación de responsabilidades:
-- **Lógica Central (`src/kodimanager/core`)**: Maneja la descarga, extracción y gestión del registro de instancias. Independiente de la GUI.
-- **GUI (`src/kodimanager/gui`)**: Una interfaz responsiva construida con PyQt6.
-- **Datos**: Utiliza un simple JSON `instances.json` para rastrear las versiones y rutas instaladas.
+## Instalación
 
-### Stack Tecnológico
-- **Lenguaje**: Python 3.10+ (Seleccionado por su robusto manejo de archivos, excelente librería estándar y soporte multiplataforma).
-- **Framework GUI**: `PyQt6` (Aspecto y sensación profesional y nativa, bucle de eventos robusto).
-- **Red**: `requests` + `beautifulsoup4` (Manejo confiable de encabezados y análisis para páginas de descarga).
-- **Entorno**: Basado en Entorno Virtual (`venv`) (Estrategia B).
+### Método Recomendado (Usuario Final)
+1. Descargue el último instalador: `KodiManager_Setup_v3.0.exe`.
+2. Ejecute el instalador y siga los pasos.
+3. Inicie **Kodi Manager** desde el acceso directo en su escritorio.
 
-## Uso del Sistema de Archivos
-- **Raíz del Proyecto**: Contiene el código fuente y los lanzadores.
-- **Datos de Ejecución**: 
-    - La configuración y el Registro de Instancias se almacenan en `%APPDATA%\KodiManager` (Windows) o `~/.config/kodimanager` (Linux) para evitar contaminar el espacio de trabajo, aunque las instancias portables se pueden instalar donde el usuario elija (por defecto en una carpeta `KodiInstances`).
-    - **Nota**: La aplicación respeta la regla de "Archivos Externos" por defecto pero permite anulaciones del usuario.
+### Desarrollo (Código Fuente)
+1. Instale Python 3.10 o superior.
+2. Clone este repositorio.
+3. Ejecute `run_app.bat` en Windows.
 
-## Instalación y Ejecución
+## Arquitectura Técnica
+La aplicación sigue una arquitectura modular y escalable:
 
-### Prerrequisitos
-- Windows 10/11 (Objetivo principal) o Linux.
-- Python 3.10 o superior instalado.
+- **Core (`src/kodimanager/core`)**: Lógica de negocio pura (Gestor de instancias, Descargador, Instalador). Decoplado de la UI.
+- **GUI (`src/kodimanager/gui`)**: Interfaz construida con **PyQt6**.
+  - **Worker Threads**: Las tareas pesadas (detección, descarga) se ejecutan en hilos secundarios para mantener la UI fluida.
+  - **Design System (`styles.py`)**: Sistema de estilos centralizado para una apariencia consistente.
+- **Datos**: Persistencia ligera usando JSON en `%APPDATA%\KodiManager`.
 
-### Ejecución
-Usamos la **Estrategia B: Entorno local del proyecto**.
-
-**Windows:**
-Haga doble clic en `run_app.bat`. Esto:
-1. Creará un entorno virtual de Python (`venv`) si falta.
-2. Instalará las dependencias.
-3. Iniciará la aplicación.
-
-**Linux/macOS:**
-Ejecute `./run_app.sh`.
-
-## Pruebas
-Ejecute las pruebas con:
-```bash
-# Active venv primero
-python -m pytest tests
-```
-
-## Seguridad y Rendimiento
-- Las descargas se verifican si los hashes están disponibles (mejora futura).
-- No se requieren privilegios de administrador para la operación estándar (a menos que se instale en carpetas protegidas, lo cual se desaconseja).
-- "Limpieza Total" es una operación destructiva; la interfaz incluye diálogos de confirmación.
+### Construcción (Build)
+Para generar el ejecutable y el instalador:
+1. Ejecute `build_exe.bat` (Genera el ejecutable optimizado en modo directorio).
+2. Compile `setup.iss` usando **Inno Setup** para crear el instalador final.
 
 ## Horario de Transmisiones (Twitch)
 🔴 **En Vivo**: Lunes, Miércoles, Viernes y Domingos
@@ -73,4 +57,3 @@ python -m pytest tests
 
 ## Autor
 **Latinokodi 2026**
-
