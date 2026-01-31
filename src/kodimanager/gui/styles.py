@@ -119,7 +119,7 @@ QPushButton#MenuBtn:hover {{
 }}
 
 /* Ko-fi Support Button */
-QPushButton#KofiBtn {
+QPushButton#KofiBtn {{
     background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FF5E5B, stop:1 #FF8FA3);
     color: white;
     font-weight: bold;
@@ -127,11 +127,11 @@ QPushButton#KofiBtn {
     border-radius: 18px; /* Full Capsule */
     padding: 8px 24px;
     border: 1px solid #FF5E5B;
-}
-QPushButton#KofiBtn:hover {
+}}
+QPushButton#KofiBtn:hover {{
     background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FF413D, stop:1 #FF7A8F);
     border: 1px solid #FF413D;
-}
+}}
 
 /* Tab Widget */
 QTabWidget::pane {{
