@@ -19,7 +19,7 @@ def restart_as_admin():
     # We can use sys.executable for both usually, but let's be careful with arguments.
     
     script = os.path.abspath(sys.argv[0])
-    params = " ".join([f'"{arg}"' for arg in sys.argv[1:]])
+    params = " ".join([f'"{arg}"' for arg in sys.argv[1:]]) + " --no-splash"
     
     try:
         if getattr(sys, 'frozen', False):

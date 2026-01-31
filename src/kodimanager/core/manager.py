@@ -59,6 +59,13 @@ class InstanceManager:
         self._save_instances()
         return instance
 
+    def _kill_process_in_folder(self, path: str):
+        try:
+            from ..utils.process import kill_process_by_path
+            kill_process_by_path(path)
+        except ImportError:
+            pass
+
     def remove_instance(self, instance_id: str, delete_files: bool = False) -> tuple[bool, str]:
         instance = self.get_by_id(instance_id)
         if not instance:
@@ -69,12 +76,11 @@ class InstanceManager:
         # 1. Delete files first if requested
         if delete_files and os.path.exists(instance.path):
             # First, kill any running processes in this folder
-            from ..utils.process import kill_process_by_path
-            kill_process_by_path(instance.path)
+            self._kill_process_in_folder(instance.path)
             
-            max_retries = 5
+            max_retries = 3
             for attempt in range(max_retries):
-                # Method 1: Python shutil
+                # Robust python deletion
                 try:
                     def on_rm_error(func, path, exc_info):
                         os.chmod(path, 0o777)
@@ -89,23 +95,12 @@ class InstanceManager:
                 
                 if not os.path.exists(instance.path):
                     break
-                
-                # Method 2: Windows System Command (Forceful)
-                try:
-                    import subprocess
-                    subprocess.run(f'rmdir /s /q "{instance.path}"', shell=True, capture_output=True)
-                except Exception:
-                    pass
-
-                if not os.path.exists(instance.path):
-                    break
                     
-                time.sleep(1) # Wait before retry
+                time.sleep(0.5) # Wait before retry
             
+            # Critical Check: If folder still exists, we abort the removal from DB
             if os.path.exists(instance.path):
-                 print(f"Failed to delete {instance.path} after retries.")
-                 # Instead of failing, we set a warning message but proceed to remove from DB
-                 warning_msg = f"No se pudo eliminar la carpeta completamente.\nPor favor elimínela manualmente:\n{instance.path}"
+                 return False, f"No se pudo eliminar la carpeta:\n{instance.path}\n\nVerifique que KODI no esté ejecutándose y que no tenga archivos abiertos."
         
         # 2. Delete shortcut if exists (Best effort)
         try:

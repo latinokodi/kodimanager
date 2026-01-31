@@ -27,19 +27,21 @@ echo [Kodi Manager] Running PyInstaller...
 set "ADD_DATA=--add-data src/kodimanager/gui/LKU-LOGO-Small.png;kodimanager/gui --add-data src/kodimanager/gui/icon.png;kodimanager/gui"
 set "ICON=--icon src/kodimanager/gui/icon.png"
 
-pyinstaller --noconfirm --clean --onefile --windowed ^
-    --name "KodiManager" ^
+
+pyinstaller --noconfirm --clean --onedir --windowed ^
+    --name "KodiManager_v3.0" ^
     --paths "src" ^
     %ADD_DATA% ^
     %ICON% ^
     launcher.py
 
 echo.
-if exist "dist\KodiManager.exe" (
+if exist "dist\KodiManager_v3.0\KodiManager_v3.0.exe" (
+
     echo [SUCCESS] Build complete! Executable is in 'dist' folder.
     start "" "dist"
 ) else (
     echo [ERROR] Build failed.
 )
 
-pause
+:: pause

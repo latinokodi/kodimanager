@@ -20,8 +20,9 @@ def test_folder_deletion_success(tmp_path):
     os.makedirs(kodi_path)
     inst = instance_manager.register_instance("InstSuccess", str(kodi_path), "19.5")
     
-    # Mock shortcut deletion to avoid errors
-    with patch.object(ShortcutManager, 'delete_shortcut', return_value=True):
+    # Mock shortcut deletion and process killing
+    with patch.object(ShortcutManager, 'delete_shortcut', return_value=True), \
+         patch.object(InstanceManager, '_kill_process_in_folder', return_value=None):
         result = instance_manager.remove_instance(inst.id, delete_files=True)
         
     assert result is True
@@ -42,13 +43,10 @@ def test_folder_deletion_failure_keeps_instance(tmp_path):
         raise OSError("Permission denied")
 
     with patch("shutil.rmtree", side_effect=failing_rmtree):
-        # Also need to mock os.path.exists to return True (simulating file still there)
-        # But we need real exists for setup, so we only mock it during the call if possible
-        # Or just let rmtree fail and rely on the fact that the directory actually still exists in reality?
-        # The code checks os.path.exists(instance.path) to verify deletion.
-        # Since we are mocking rmtree to do nothing (raise error), the real folder stays.
+        # We assume real internal os.path.exists works
         
-        with patch.object(ShortcutManager, 'delete_shortcut', return_value=True):
+        with patch.object(ShortcutManager, 'delete_shortcut', return_value=True), \
+             patch.object(InstanceManager, '_kill_process_in_folder', return_value=None):
              result = instance_manager.remove_instance(inst.id, delete_files=True)
              
     assert result is False

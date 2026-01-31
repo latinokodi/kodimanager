@@ -1,154 +1,209 @@
-DARK_THEME = """
-QMainWindow, QWidget {
-    background-color: #1f1f1f;
-    color: #ffffff;
-    font-family: 'Roboto', 'Segoe UI', sans-serif;
-    font-size: 16px;
+COLORS = {
+    "background": "#0f172a", # Slate 900
+    "surface": "#1e293b",     # Slate 800
+    "surface_hover": "#334155", # Slate 700
+    "primary": "#3b82f6",     # Blue 500
+    "primary_hover": "#2563eb", # Blue 600
+    "text": "#f1f5f9",        # Slate 100
+    "text_muted": "#94a3b8",  # Slate 400
+    "accent": "#06b6d4",      # Cyan 500
+    "success": "#10b981",     # Emerald 500
+    "danger": "#ef4444",      # Red 500
+    "border": "#334155",      # Slate 700
 }
 
-QTabWidget::pane {
-    border: 1px solid #333333;
-    background-color: #1f1f1f;
-}
-
-QTabBar::tab {
-    background-color: #2b2b2b;
-    color: #aaaaaa;
-    padding: 10px 20px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    margin-right: 2px;
-}
-
-QTabBar::tab:selected {
-    background-color: #60a5fa; /* Blue accent */
-    color: #ffffff;
-    font-weight: bold;
-}
-
-QPushButton {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 16px;
-}
-
-QPushButton:hover {
-    background-color: #2563eb;
-}
-
-QPushButton:pressed {
-    background-color: #1d4ed8;
-}
-
-QPushButton#ActionBtn {
-    background-color: #374151; /* Darker grey for secondary actions */
-}
-
-QPushButton#ActionBtn:hover {
-    background-color: #4b5563;
-}
-
-QFrame#Card {
-    background-color: #2b2b2b;
-    border-radius: 12px;
-    border: 1px solid #3d3d3d;
-}
-
-QFrame#Card:hover {
-    border: 1px solid #60a5fa;
-    background-color: #333333;
-}
-
-QFrame#Card QLabel {
-    background-color: transparent;
-}
-
-QLabel#CardTitle {
-    font-size: 22px;
-    font-weight: bold;
-    color: #f3f4f6;
-    background-color: transparent;
-}
-
-QLabel#CardSubtitle {
-    color: #9ca3af;
+GLASS_THEME = f"""
+/* Global Reset */
+QMainWindow, QDialog, QMessageBox {{
+    background-color: {COLORS['background']};
+    color: {COLORS['text']};
+    font-family: 'Segoe UI', sans-serif;
     font-size: 14px;
-    background-color: transparent;
-}
+}}
 
-QPushButton#MenuBtn {
-    background-color: #4b5563;
-    color: #ffffff;
-    font-size: 24px;
-    font-weight: bold;
-    border-radius: 6px;
-    border: none;
-    padding: 0px;
-    margin: 0px;
-}
+QMessageBox QPushButton {{
+    background-color: {COLORS['surface_hover']};
+    border: 1px solid {COLORS['border']};
+    color: {COLORS['text']};
+    min-width: 60px;
+}}
 
-QPushButton#MenuBtn:hover {
-    background-color: #60a5fa;
-}
-
-QScrollArea {
-    border: none;
-    background-color: transparent;
-}
-
-QScrollBar:vertical {
-    border: none;
-    background: #1f1f1f;
-    width: 10px;
-    margin: 0px 0px 0px 0px;
-}
-
-QScrollBar::handle:vertical {
-    background: #4b5563;
-    min-height: 20px;
-    border-radius: 5px;
-}
-
-QMenu {
-    background-color: #2b2b2b;
-    border: 1px solid #3d3d3d;
-    color: #ffffff;
-    padding: 5px;
-}
-
-QMenu::item {
-    padding: 8px 25px;
-    border-radius: 4px;
-}
-
-QMenu::item:selected {
-    background-color: #3b82f6; /* Highlight color */
+QMessageBox QPushButton:hover {{
+    background-color: {COLORS['primary']};
     color: white;
+    border: 1px solid {COLORS['primary']};
+}}
+
+QLabel {{
+    color: {COLORS['text']};
+}}
+
+/* Clean Scrollbars */
+QScrollBar:vertical {{
+    border: none;
+    background: {COLORS['background']};
+    width: 8px;
+    margin: 0;
+    border-radius: 4px;
+}}
+QScrollBar::handle:vertical {{
+    background: {COLORS['surface_hover']};
+    min-height: 20px;
+    border-radius: 4px;
+}}
+QScrollBar::handle:vertical:hover {{
+    background: {COLORS['text_muted']};
+}}
+
+/* Cards - Modern Glass-like Surface */
+QFrame#Card {{
+    background-color: {COLORS['surface']}; 
+    border: 1px solid {COLORS['border']};
+    border-radius: 12px;
+}}
+QFrame#Card:hover {{
+    background-color: {COLORS['surface_hover']};
+    border: 1px solid {COLORS['primary']};
+}}
+
+/* Typography */
+QLabel#CardTitle {{
+    color: {COLORS['text']};
+    font-size: 16px;
+    font-weight: 700;
+}}
+QLabel#CardSubtitle {{
+    color: {COLORS['text_muted']};
+    font-size: 13px;
+}}
+
+/* Buttons - Flat & Hero */
+QPushButton {{
+    background-color: {COLORS['primary']};
+    color: white;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 600;
+    border: none;
+}}
+QPushButton:hover {{
+    background-color: {COLORS['primary_hover']};
+}}
+QPushButton:pressed {{
+    background-color: #1d4ed8;
+}}
+
+/* Secondary / Ghost Buttons */
+QPushButton#ActionBtn {{
+    background-color: transparent;
+    border: 1px solid {COLORS['border']};
+    color: {COLORS['text']};
+}}
+QPushButton#ActionBtn:hover {{
+    background-color: {COLORS['surface_hover']};
+    border-color: {COLORS['text_muted']};
+}}
+
+/* Menu Button (Icon Only) */
+QPushButton#MenuBtn {{
+    background-color: transparent;
+    color: {COLORS['text_muted']};
+    font-size: 18px;
+    font-weight: 900;
+    border-radius: 4px;
+    padding: 4px;
+}}
+QPushButton#MenuBtn:hover {{
+    background-color: {COLORS['surface_hover']};
+    color: {COLORS['text']};
+}}
+
+/* Ko-fi Support Button */
+QPushButton#KofiBtn {
+    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FF5E5B, stop:1 #FF8FA3);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 18px; /* Full Capsule */
+    padding: 8px 24px;
+    border: 1px solid #FF5E5B;
+}
+QPushButton#KofiBtn:hover {
+    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FF413D, stop:1 #FF7A8F);
+    border: 1px solid #FF413D;
 }
 
-QRadioButton {
-    color: #ffffff;
-    spacing: 5px;
-}
-
-QRadioButton::indicator {
-    width: 14px;
-    height: 14px;
+/* Tab Widget */
+QTabWidget::pane {{
+    border: 1px solid {COLORS['border']};
+    background-color: {COLORS['surface']};
     border-radius: 8px;
-    border: 2px solid #60a5fa;
-    background: transparent;
-}
+}}
+QTabBar::tab {{
+    background-color: {COLORS['background']};
+    color: {COLORS['text_muted']};
+    padding: 10px 20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-right: 2px;
+}}
+QTabBar::tab:selected {{
+    background-color: {COLORS['surface']};
+    color: {COLORS['primary']};
+    font-weight: bold;
+}}
 
-QRadioButton::indicator:checked {
-    background: #60a5fa;
-    border: 2px solid #60a5fa;
-}
+/* Context Menu */
+QMenu {{
+    background-color: {COLORS['surface']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 8px;
+    padding: 4px;
+}}
+QMenu::item {{
+    padding: 6px 24px;
+    border-radius: 4px;
+    color: {COLORS['text']};
+}}
+QMenu::item:selected {{
+    background-color: {COLORS['primary']};
+    color: white;
+}}
+QMenu::separator {{
+    height: 1px;
+    background: {COLORS['border']};
+    margin: 4px 0;
+}}
 
-QRadioButton::indicator:unchecked:hover {
-    border: 2px solid #ffffff;
-}
+/* Input Fields */
+QLineEdit {{
+    background-color: {COLORS['background']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 6px;
+    padding: 8px;
+    color: {COLORS['text']};
+}}
+QLineEdit:focus {{
+    border: 1px solid {COLORS['primary']};
+}}
+
+/* Tooltips */
+QToolTip {{
+    background-color: {COLORS['surface']};
+    color: {COLORS['text']};
+    border: 1px solid {COLORS['border']};
+    border-radius: 4px;
+    opacity: 230; 
+}}
+
+/* Progress Bar */
+QProgressBar {{
+    background-color: {COLORS['surface']};
+    border-radius: 4px;
+    text-align: center;
+}}
+QProgressBar::chunk {{
+    background-color: {COLORS['primary']};
+    border-radius: 4px;
+}}
 """

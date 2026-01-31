@@ -1,4 +1,5 @@
 import os
+import sys
 import threading
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
                             QLineEdit, QPushButton, QComboBox, QProgressBar, 
@@ -25,17 +26,32 @@ class InstallThread(QThread):
         
     def run(self):
         try:
-            temp_dir = os.path.join(os.environ.get('TEMP', '.'), 'KodiManager_DL')
-            if not os.path.exists(temp_dir): os.makedirs(temp_dir)
+            # Determine app root directory (works for both script and frozen exe)
+            if getattr(sys, 'frozen', False):
+                app_dir = os.path.dirname(sys.executable)
+            else:
+                # Up 3 levels from gui/dialogs.py -> src/kodimanager/gui -> src/kodimanager -> src -> root
+                # actually just use os.getcwd() if running from source usually works, but safer relative to key file
+                # If running from launcher.py, CWD is usually project root.
+                app_dir = os.getcwd()
+
+            installers_dir = os.path.join(app_dir, 'Kodi_Installers')
+            if not os.path.exists(installers_dir):
+                os.makedirs(installers_dir)
             
-            installer_path = os.path.join(temp_dir, self.version_data['filename'])
+            installer_path = os.path.join(installers_dir, self.version_data['filename'])
             
             def dl_progress(curr, total):
                 if total:
                     self.progress.emit("Descargando...", (curr / total) * 0.5)
             
-            self.progress.emit("Iniciando descarga...", 0.1)
-            self.downloader.download_file(self.version_data['url'], installer_path, progress_callback=dl_progress)
+            if os.path.exists(installer_path):
+                 self.progress.emit("Instalador encontrado. Verificando...", 0.1)
+                 # fast forward
+                 self.progress.emit("Preparando instalación...", 0.5)
+            else:
+                self.progress.emit("Iniciando descarga...", 0.1)
+                self.downloader.download_file(self.version_data['url'], installer_path, progress_callback=dl_progress)
             
             self.progress.emit("Instalando...", 0.6)
             final_path = os.path.join(self.target_path, self.name)
@@ -44,8 +60,9 @@ class InstallThread(QThread):
             success, msg = KodiInstaller.install(installer_path, final_path)
             
             if success:
-                self.progress.emit("Limpiando...", 0.9)
-                if os.path.exists(installer_path): os.remove(installer_path)
+                self.progress.emit("Finalizando...", 0.9)
+                # We KEEP the installer now
+                # if os.path.exists(installer_path): os.remove(installer_path)
                 self.finished_signal.emit(True, final_path)
             else:
                 self.finished_signal.emit(False, msg)
@@ -382,7 +399,7 @@ class AboutDialog(QDialog):
         title.setStyleSheet("font-size: 26px; font-weight: bold; color: white;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        subtitle = QLabel("Versión 2.0 (PyQt6 Edition)")
+        subtitle = QLabel("Versión 3.0 (PyQt6 Edition)")
         subtitle.setStyleSheet("color: gray;")
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
 

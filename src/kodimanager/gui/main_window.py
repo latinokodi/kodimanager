@@ -4,7 +4,7 @@ import webbrowser
 import math
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                             QScrollArea, QPushButton, QLabel, QFrame,
-                            QTabWidget, QMessageBox, QMenu, QApplication, QGridLayout, QSizePolicy)
+                            QTabWidget, QMessageBox, QMenu, QApplication, QGridLayout, QSizePolicy, QProgressBar)
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from PyQt6.QtGui import QIcon, QAction, QPixmap
 
@@ -12,7 +12,8 @@ from ..core.manager import InstanceManager
 from ..core.models import KodiInstance
 from ..utils import admin
 from .dialogs import InstallDialog, ShortcutDialog, AboutDialog
-from .styles import DARK_THEME
+from .styles import GLASS_THEME
+from .worker import Worker
 
 class InstanceCard(QFrame):
     launch_clicked = pyqtSignal(str) # instance_id
@@ -27,43 +28,58 @@ class InstanceCard(QFrame):
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(15, 15, 15, 15)
-        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(12)
         
         # Header: Name + Menu
         header_layout = QHBoxLayout()
+        header_layout.setSpacing(10)
+        
         name_label = QLabel(self.instance.name)
         name_label.setObjectName("CardTitle")
         name_label.setWordWrap(True)
         
-        btn_menu = QPushButton("...")
-        btn_menu.setFixedSize(45, 35)
-        btn_menu.setContentsMargins(0, 0, 0, 0)
-        btn_menu.setObjectName("MenuBtn")
+        btn_menu = QPushButton("⋮") # Vertical ellipsis is cleaner
+        btn_menu.setFixedSize(30, 30)
         btn_menu.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_menu.setObjectName("MenuBtn")
         btn_menu.clicked.connect(self.on_menu_click)
         
         header_layout.addWidget(name_label, 1) # Expand name
         header_layout.addWidget(btn_menu)
         layout.addLayout(header_layout)
         
-        # Details
+        # Divider Line (Optional, maybe just spacing)
+        # line = QFrame()
+        # line.setFrameShape(QFrame.Shape.HLine)
+        # line.setStyleSheet("background-color: #27272a; height: 1px; border: none;")
+        # layout.addWidget(line)
+
+        # Details Information
+        details_layout = QVBoxLayout()
+        details_layout.setSpacing(4)
+        
+        # Version Badge / Text
         ver_label = QLabel(f"Versión: {self.instance.version}")
         ver_label.setObjectName("CardSubtitle")
-        layout.addWidget(ver_label)
+        ver_label.setStyleSheet("color: #60a5fa; font-weight: 600;") # Blue accent text
+        details_layout.addWidget(ver_label)
         
+        # Path
         path_label = QLabel(self.instance.path)
         path_label.setObjectName("CardSubtitle")
         path_label.setWordWrap(True)
-        path_label.setStyleSheet("font-size: 12px; color: #6b7280;") # Extra styling
-        layout.addWidget(path_label)
+        path_label.setStyleSheet("color: #71717a; font-size: 12px;") # Muted text
+        details_layout.addWidget(path_label)
+        
+        layout.addLayout(details_layout)
         
         layout.addStretch()
         
         # Launch Button
         btn_launch = QPushButton("INICIAR")
         btn_launch.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_launch.setFixedHeight(35)
+        btn_launch.setFixedHeight(40) # Taller button
         btn_launch.clicked.connect(lambda: self.launch_clicked.emit(self.instance.id))
         layout.addWidget(btn_launch)
 
@@ -95,14 +111,15 @@ class MainWindow(QMainWindow):
         
         self.setup_manager_view()
         
-        # Show About Dialog on startup
-        self.show_about_dialog()
+        # Show About Dialog on startup if not suppressed
+        if "--no-splash" not in sys.argv:
+            self.show_about_dialog()
 
     def setup_manager_view(self):
         toolbar = QHBoxLayout()
         
         title = QLabel("Dashboard")
-        title.setStyleSheet("font-size: 26px; font-weight: bold; color: #60a5fa;")
+        title.setStyleSheet("font-size: 28px; font-weight: 800; color: #f3f4f6; margin-bottom: 10px;")
         toolbar.addWidget(title)
         
         toolbar.addStretch()
@@ -129,7 +146,16 @@ class MainWindow(QMainWindow):
         self.btn_about = QPushButton("Acerca de")
         self.btn_about.setObjectName("ActionBtn")
         self.btn_about.clicked.connect(self.show_about_dialog)
+
+        # Ko-fi Button
+        self.btn_kofi = QPushButton("☕ Cómprame un café")
+        self.btn_kofi.setObjectName("KofiBtn")
+        self.btn_kofi.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_kofi.clicked.connect(lambda: webbrowser.open("https://ko-fi.com/latinokodi"))
         
+        toolbar.addWidget(self.btn_kofi)
+        toolbar.addSpacing(10)
+
         toolbar.addWidget(self.btn_detect)
         toolbar.addWidget(self.btn_refresh)
         toolbar.addWidget(self.btn_add)
@@ -145,6 +171,13 @@ class MainWindow(QMainWindow):
         toolbar.addWidget(self.btn_about)
             
         self.main_layout.addLayout(toolbar)
+        
+        # Progress Bar (Hidden by default)
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setRange(0, 0) # Indeterminate
+        self.progress_bar.setVisible(False)
+        self.progress_bar.setStyleSheet("QProgressBar { height: 4px; background: #27272a; border: none; } QProgressBar::chunk { background: #2563eb; }")
+        self.main_layout.addWidget(self.progress_bar)
         
         # Scroll Area for Grid
         self.scroll_area = QScrollArea()
@@ -202,7 +235,19 @@ class MainWindow(QMainWindow):
              self.prompt_shortcut(new_inst)
 
     def detect_instances(self):
-        detected = self.manager.detect_installed_instances()
+        self.progress_bar.setVisible(True)
+        self.btn_detect.setEnabled(False)
+        self.worker = Worker(self.manager.detect_installed_instances)
+        self.worker.finished.connect(self.on_detection_finished)
+        self.worker.start()
+
+    def on_detection_finished(self, detected):
+        self.progress_bar.setVisible(False)
+        self.btn_detect.setEnabled(True)
+        if isinstance(detected, Exception):
+            QMessageBox.critical(self, "Error", f"Error al detectar: {str(detected)}")
+            return
+            
         self.refresh_list()
         if detected:
              QMessageBox.information(self, "Detectar", f"Se encontraron {len(detected)} instalaciones nuevas.")
@@ -228,7 +273,7 @@ class MainWindow(QMainWindow):
         if not inst: return
 
         menu = QMenu(self)
-        menu.setStyleSheet(DARK_THEME) # Apply theme to menu too
+        menu.setStyleSheet(GLASS_THEME) # Apply theme to menu too
 
         action_launch = QAction("Iniciar", self)
         action_launch.triggered.connect(lambda: self.launch_instance_by_id(inst_id))
@@ -289,11 +334,12 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion") # Best base for custom styling
-    app.setStyleSheet(DARK_THEME)
+    app.setStyleSheet(GLASS_THEME)
     
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()
